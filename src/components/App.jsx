@@ -1,88 +1,61 @@
-import React, { useEffect } from 'react';
-
-// import { nanoid } from 'nanoid';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-
-import AppStyle from './AppStyle.module.css';
-import { FilterContact } from './FiltrContact/FilterContact';
-import { ListContact } from './ListContact/ListContact';
-import { FormContact } from './FormContact/FormContact';
-// import {
-//   addContact,
-//   filterContacts,
-//   removeContacts,
-// } from './redux/sliceContacts';
+import { lazy, Suspense, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchContacts } from 'redux/backendAPI';
-import { getIsLoading, getError } from 'redux/contactsSelector';
+import { Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { fetchCurrentUser } from 'redux/auth/auth-operations';
+import { getToken } from 'redux/selectors';
+import { Header } from './Header';
+import { PrivateRoute } from './PrivateRoute';
+import { PublicRoute } from './PublicRoute';
 
-// const CONTACTS_KEY = 'contacts';
+const Home = lazy(() => import('../pages/Home'));
+const ContactsPage = lazy(() => import('../pages/Contacts'));
+const Register = lazy(() => import('../pages/Register'));
+const Login = lazy(() => import('../pages/Login'));
 
 export const App = () => {
   const dispatch = useDispatch();
-  const isLoading = useSelector(getIsLoading);
-  const error = useSelector(getError);
-  // const parsContacts = JSON.parse(localStorage.getItem(CONTACTS_KEY));
-  // const [contacts, setContacts] = useState(
-  //   () =>
-  //     parsContacts ?? [
-  //       { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-  //       { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-  //       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-  //       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  //       { id: 'id-5', name: 'Ihor Kalyta', number: '577-99-77' },
-  //     ]
-  // );
-  // const [filter, setFilter] = useState('');
+  const token = useSelector(getToken);
 
   useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
-  // const addContact = contact => {
-  //   const newContact = {
-  //     name: contact.name,
-  //     number: contact.number,
-  //     id: nanoid(),
-  //   };
-
-  //   if (contacts.some(event => event.name === contact.name)) {
-  //     toast.info(`${contact.name} is already in contacts.`);
-  //   } else {
-  //     toast.success(`${contact.name} added to contacts.`);
-  //     return setContacts(prevState => [newContact, ...prevState]);
-  //   }
-  // };
-
-  // const filterContacts = event => {
-  //   setFilter(event.currentTarget.value);
-  //   if (event.currentTarget.value.length > 0) {
-  //     toast.warn(
-  //       `The following matches were found for the query " ${event.currentTarget.value} ".`
-  //     );
-  //   }
-  // };
-
-  // const getContacts = contacts.filter(contact =>
-  //   contact.name.toLowerCase().includes(filter.toLowerCase())
-  // );
-
-  // const removeContacts = (contactId, name) => {
-  //   setContacts(contacts.filter(contact => contact.id !== contactId));
-  //   toast.error(`${name} deleted from contacts.`);
-  // };
+    if (token) {
+      dispatch(fetchCurrentUser());
+    }
+    return;
+  }, [dispatch, token]);
 
   return (
-    <div className={AppStyle.container}>
-      <h1 className={AppStyle.primeryTitle}>Phonebook</h1>
-      <FormContact />
-      {/* <ToastContainer /> */}
+    <>
+      <Header />
+      <main>
+        <Suspense>
+          <Routes>
+            <Route path="/" element={<Home />} />
 
-      <h2 className={AppStyle.secondaryTitle}>Contacts </h2>
-      <FilterContact />
-      {isLoading && !error && <p>Request in progress...</p>}
-      <ListContact />
-    </div>
+            <Route path="/" element={<PrivateRoute />}>
+              <Route path="/contacts" element={<ContactsPage />} />
+            </Route>
+
+            <Route path="/" element={<PublicRoute />}>
+              <Route path="/registration" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </main>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </>
   );
 };

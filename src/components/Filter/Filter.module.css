@@ -1,27 +1,14 @@
-.label {
-  display: flex;
-  flex-direction: column;
-}
-
 .input {
-  background: #222;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  width: 80%;
+  height: 35px;
   background: linear-gradient(#333, #222);
+  outline: none;
   border: 2px solid #515050;
   border-radius: 10px;
-  /* box-shadow: 0 2px 0 #000; */
-  color: #888;
-  display: block;
-  float: left;
-  font-family: 'Cabin', helvetica, arial, sans-serif;
   font-size: 18px;
-  font-weight: 400;
-  height: 33px;
-  margin: 0;
-  padding: 0 10px;
-  text-shadow: 0 -1px 0 #000;
-  width: 300px;
-
-  line-height: 40px;
+  color: #888;
 }
 
 .input::-webkit-input-placeholder {
@@ -58,7 +45,7 @@
   }
   100% {
     border-color: #6f6;
-    box-shadow: 0 0 20px rgba(255, 247, 0, 0.674),
-      inset 0 0 10px rgba(204, 255, 0, 0.4);
+    box-shadow: 0 0 20px rgba(12, 182, 117, 0.674),
+      inset 0 0 10px rgba(12, 182, 117, 0.4);
   }
 }
